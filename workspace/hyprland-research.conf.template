@@ -1,0 +1,11 @@
+# Template: pin the research web apps to workspace 4.
+# 1. Run workspace/research-workspace.sh once.
+# 2. Run `hyprctl clients` and copy the exact `class:` value of each window.
+# 3. Replace the placeholders, then add the lines to your user Hyprland config
+#    (under ~/.config/hypr/, not /usr/share/omarchy).
+# 4. Run `hyprctl reload` and `hyprctl configerrors`.
+# Rule syntax differs between Hyprland versions: check `hyprctl version` and the
+# Hyprland wiki for your version before applying.
+
+# windowrule = workspace 4, class:<PERPLEXITY_CLASS>
+# windowrule = workspace 4, class:<GEMINI_CLASS>
