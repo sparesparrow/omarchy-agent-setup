@@ -1,0 +1,6 @@
+# Alternative to the script: add to ~/.codex/config.toml
+# Playwright runs headed by default; do NOT add a headless flag during setup.
+
+[mcp_servers.playwright]
+command = "npx"
+args = ["-y", "@playwright/mcp@latest"]
