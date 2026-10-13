@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/bin/bash
 # Registers the Playwright MCP server with Codex. Browser stays visible (headed)
 # so you can log in or solve CAPTCHAs manually.
 set -euo pipefail
