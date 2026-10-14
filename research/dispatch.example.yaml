@@ -1,17 +1,11 @@
 job_id: issue-123
 question: "Determine the safest implementation of the telemetry parser"
-
 parallel:
   - provider: perplexity
-    focus: >
-      Current libraries, known vulnerabilities, recent upstream changes,
-      competing implementations, and authoritative external sources.
+    focus: "Current libraries, vulnerabilities, upstream changes, and external sources."
   - provider: gemini
-    focus: >
-      Standards, official documentation, architectural approaches,
-      edge cases, and compatibility constraints.
-
+    focus: "Standards, official documentation, architecture, and compatibility."
 output:
-  directory: .agents/research/issue-123
+  directory: .agents/research/inbox/issue-123
   require_citations: true
   max_summary_words: 1200
