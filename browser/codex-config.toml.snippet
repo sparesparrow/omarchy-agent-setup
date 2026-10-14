@@ -1,6 +1,9 @@
-# Alternative to the script: add to ~/.codex/config.toml
-# Playwright runs headed by default; do NOT add a headless flag during setup.
+# Alternative to setup-playwright-mcp.sh; do not install both versions.
+# Replace both /ABSOLUTE/... paths. TOML does not expand shell variables here.
+# This profile is separate from the workspace-4 Perplexity/Gemini profiles.
+# Create the profile directory with mode 700 before starting Codex.
 
 [mcp_servers.playwright]
 command = "npx"
-args = ["-y", "@playwright/mcp@latest"]
+args = ["-y", "@playwright/mcp@latest", "--user-data-dir", "/ABSOLUTE/PROFILE/DIRECTORY", "--output-dir", "/ABSOLUTE/REPO/.agents/research/inbox"]
+env = { PLAYWRIGHT_MCP_HEADLESS = "false", PLAYWRIGHT_MCP_ISOLATED = "false" }
