@@ -5,6 +5,10 @@ Decides which agent plays executor and evaluator, based on which agents are
 marked exhausted, and when to escalate to Claude. It only DECIDES and prints the
 choice; it does not start any agent, so it needs no keys and costs nothing.
 
+Claude is never picked as evaluator automatically. When no other evaluator is
+left, route returns action "ask"; Claude is used only after
+`router.py approve claude-eval`, and that approval is consumed by one route.
+
 State file: ~/.local/state/omarchy-agents/state.json (override with ROUTER_STATE)
 
 Commands:
@@ -13,7 +17,8 @@ Commands:
   router.py status                                 show state
   router.py route                                  print the current routing as JSON
   router.py failed                                 record a failed executor/evaluator loop
-  router.py passed                                 reset the failed-loop counter
+  router.py passed                                 reset the failed-loop counter and approval
+  router.py approve claude-eval                    one-time OK for a diff-only Claude review
 """
 import json
 import os
@@ -50,13 +55,24 @@ def is_exhausted(s, agent):
     return now() < datetime.fromisoformat(until)
 
 
+def claude_eval(s, executor, reason):
+    """Claude as evaluator only with explicit approval; otherwise ask the user."""
+    if s.get("claude_eval_approved"):
+        return {"action": "run", "executor": executor, "evaluator": "claude-diff-only",
+                "note": "approved one-time short diff-only review by claude"}
+    return {"action": "ask", "executor": executor, "evaluator": None, "reason": reason,
+            "options": ["pause", "claude-diff-only (run: router.py approve claude-eval)"]}
+
+
 def route(s):
     codex_out = is_exhausted(s, "codex")
     grok_out = is_exhausted(s, "grok")
     gemini_out = is_exhausted(s, "gemini")
 
     if s["failed_loops"] >= MAX_FAILED_LOOPS:
-        return {"action": "replan", "agent": "claude", "reason": f"{s['failed_loops']} failed loops"}
+        return {"action": "replan", "agent": "claude",
+                "reason": f"{s['failed_loops']} failed loops",
+                "note": "planning, not evaluation"}
 
     if not codex_out and not grok_out:
         return {"action": "run", "executor": "codex", "evaluator": "grok"}
@@ -66,14 +82,12 @@ def route(s):
         return {"action": "run", "executor": "gemini", "evaluator": "grok"}
     if grok_out and not codex_out:
         if gemini_out:
-            return {"action": "run", "executor": "codex", "evaluator": "claude-diff-only",
-                    "note": "grok and gemini exhausted; short diff-only review by claude"}
+            return claude_eval(s, "codex", "grok and gemini exhausted; no free evaluator left")
         return {"action": "run", "executor": "codex", "evaluator": "gemini-fresh-session",
                 "note": "give evaluator only plan, acceptance, diff and test results"}
     if gemini_out:
         return {"action": "pause", "reason": "codex, grok and gemini exhausted; wait for reset"}
-    return {"action": "run", "executor": "gemini", "evaluator": "claude-diff-only",
-            "note": "codex and grok exhausted; or pause until quotas reset"}
+    return claude_eval(s, "gemini", "codex and grok exhausted; no free evaluator left")
 
 
 def main(argv):
@@ -93,18 +107,28 @@ def main(argv):
                 until = datetime.fromisoformat(rest[rest.index("--until") + 1]).astimezone(timezone.utc).isoformat()
             s["exhausted"][agent] = until
         save(s)
+    elif cmd == "approve":
+        if rest != ["claude-eval"]:
+            sys.exit("usage: router.py approve claude-eval")
+        s["claude_eval_approved"] = True
+        save(s)
     elif cmd == "failed":
         s["failed_loops"] += 1
         save(s)
     elif cmd == "passed":
         s["failed_loops"] = 0
+        s.pop("claude_eval_approved", None)
         save(s)
     elif cmd not in ("status", "route"):
         sys.exit(__doc__)
     if cmd == "status":
         print(json.dumps(s, indent=2))
-    else:
-        print(json.dumps(route(s)))
+        return
+    result = route(s)
+    if cmd == "route" and result.get("evaluator") == "claude-diff-only" and s.get("claude_eval_approved"):
+        s.pop("claude_eval_approved")
+        save(s)
+    print(json.dumps(result))
 
 
 if __name__ == "__main__":
