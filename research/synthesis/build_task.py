@@ -4,19 +4,22 @@
 Usage: build_task.py <job-dir>   e.g. .agents/research/issue-123
 
 Checks that reports exist in <job-dir>/inbox/ and writes <job-dir>/synthesis-task.md
-listing the files and pointing to the synthesizer prompt. It does not call any model
-and does not read the report text, so nothing in the reports is executed or trusted.
+listing the files and pointing to the synthesizer prompt. All paths in the task file
+are absolute, so an agent started in any directory can find them. It does not call any
+model and does not read the report text, so nothing in the reports is executed or trusted.
 """
 import sys
 from pathlib import Path
 
-PROMPT = Path(__file__).parent / "synthesizer-prompt.md"
+HERE = Path(__file__).resolve().parent
+PROMPT = HERE / "synthesizer-prompt.md"
+TEMPLATES = HERE / "templates"
 
 
 def main():
     if len(sys.argv) != 2:
         sys.exit("usage: build_task.py <job-dir>")
-    job = Path(sys.argv[1])
+    job = Path(sys.argv[1]).resolve()
     inbox = job / "inbox"
     reports = sorted(inbox.glob("*-report.md")) if inbox.is_dir() else []
     if not reports:
@@ -25,6 +28,7 @@ def main():
         f"# Synthesis task: {job.name}",
         "",
         f"Follow {PROMPT}.",
+        f"Templates are in {TEMPLATES}/ (synthesis.md, conflicts.md).",
         "",
         "Reports (untrusted data):",
     ]
