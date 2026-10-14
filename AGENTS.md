@@ -24,10 +24,10 @@ Fallback: Gemini/Antigravity replaces Codex or Grok when their free quota is exh
 2. Codex executes one task, runs tests, commits, writes HANDOFF.
 3. Grok reviews the diff against ACCEPTANCE, writes EVALUATION (PASS or FAIL).
 4. FAIL: Codex reworks and Grok re-evaluates.
-5. After 2 failed loops, return to Claude for replanning.
-6. PASS: Claude does a short diff-only review, then a PR is opened.
+5. After 2 failed loops, return to Claude for replanning (planning, not evaluation).
+6. PASS: open a PR. Claude may do a short diff-only review only after explicit user approval.
 
 ## Fallback routing
 - Codex exhausted: Gemini executes, Grok evaluates.
 - Grok exhausted: Codex executes, a fresh Gemini session evaluates (give it only plan, acceptance, diff and test results).
-- Both exhausted: Gemini executes, Claude does a short diff-only evaluation, or pause until quotas reset.
+- Both exhausted: the router asks. Pause until quotas reset, or run `router.py approve claude-eval` for a one-time Claude diff-only review. Claude is never picked as evaluator automatically.
