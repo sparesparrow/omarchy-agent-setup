@@ -3,16 +3,34 @@
 
 import argparse
 import json
+import os
 import re
+import tempfile
 from dataclasses import dataclass
 from pathlib import Path, PurePosixPath
 
 TOKEN = re.compile(r"{{\s*([a-z][a-z0-9_]*)\s*}}")
 NAME = re.compile(r"[a-z][a-z0-9-]*")
+VARIABLE = re.compile(r"[a-z][a-z0-9_]*")
+VERSION = re.compile(r"(?:0|[1-9][0-9]*)\.(?:0|[1-9][0-9]*)\.(?:0|[1-9][0-9]*)")
 
 
 class TemplateError(ValueError):
     pass
+
+
+def safe_relative_path(value, field):
+    path = PurePosixPath(value) if isinstance(value, str) else None
+    if not path or path.is_absolute() or ".." in path.parts:
+        raise TemplateError(f"unsafe {field}: {value!r}")
+    return path
+
+
+def ensure_within(path: Path, root: Path, field: str):
+    try:
+        path.resolve(strict=False).relative_to(root.resolve(strict=False))
+    except ValueError as error:
+        raise TemplateError(f"{field} escapes its root: {path}") from error
 
 
 @dataclass(frozen=True)
@@ -33,31 +51,56 @@ class WorkflowTemplate:
         except (OSError, json.JSONDecodeError) as error:
             raise TemplateError(f"cannot load {metadata_path}: {error}") from error
         required = {"name", "description", "version", "variables", "files"}
+        allowed = required | {"markers"}
+        if not isinstance(metadata, dict) or set(metadata) - allowed:
+            raise TemplateError(f"{metadata_path}: unsupported metadata fields")
         missing = sorted(required - metadata.keys())
         if missing:
             raise TemplateError(f"{metadata_path}: missing {', '.join(missing)}")
         name = metadata["name"]
         if not isinstance(name, str) or not NAME.fullmatch(name) or name != directory.name:
             raise TemplateError(f"{metadata_path}: invalid or mismatched name")
+        if not isinstance(metadata["description"], str) or not metadata["description"].strip():
+            raise TemplateError(f"{metadata_path}: description must be a non-empty string")
+        if not isinstance(metadata["version"], str) or not VERSION.fullmatch(metadata["version"]):
+            raise TemplateError(f"{metadata_path}: version must be MAJOR.MINOR.PATCH")
         if not isinstance(metadata["variables"], dict) or not isinstance(metadata["files"], list):
             raise TemplateError(f"{metadata_path}: variables must be an object and files a list")
+        variables = metadata["variables"]
+        for variable, spec in variables.items():
+            if not isinstance(variable, str) or not VARIABLE.fullmatch(variable) or not isinstance(spec, dict):
+                raise TemplateError(f"{metadata_path}: invalid variable {variable!r}")
+            if set(spec) - {"required", "default", "description"}:
+                raise TemplateError(f"{metadata_path}: unsupported metadata for variable {variable}")
+            if "required" in spec and not isinstance(spec["required"], bool):
+                raise TemplateError(f"{metadata_path}: required must be boolean for {variable}")
+            if spec.get("required") and "default" in spec:
+                raise TemplateError(f"{metadata_path}: required variable {variable} cannot have a default")
+            if "description" in spec and not isinstance(spec["description"], str):
+                raise TemplateError(f"{metadata_path}: description must be a string for {variable}")
         markers = metadata.get("markers", [])
-        if not isinstance(markers, list) or not all(isinstance(item, str) and item for item in markers):
-            raise TemplateError(f"{metadata_path}: markers must be non-empty strings")
+        if not isinstance(markers, list) or not markers or not all(isinstance(item, str) and item for item in markers):
+            raise TemplateError(f"{metadata_path}: markers must be a non-empty list of strings")
         files = []
+        destinations = set()
+        root = directory.resolve()
         for item in metadata["files"]:
             if not isinstance(item, dict) or set(item) != {"source", "destination"}:
                 raise TemplateError(f"{metadata_path}: every file needs source and destination")
-            for key in ("source", "destination"):
-                value = item[key]
-                path = PurePosixPath(value) if isinstance(value, str) else None
-                if not path or path.is_absolute() or ".." in path.parts:
-                    raise TemplateError(f"{metadata_path}: unsafe {key}")
-            if not (directory / item["source"]).is_file():
-                raise TemplateError(f"{metadata_path}: source does not exist: {item['source']}")
-            files.append(item)
+            source_relative = safe_relative_path(item["source"], "source")
+            destination = safe_relative_path(item["destination"], "destination")
+            if str(destination) in destinations:
+                raise TemplateError(f"{metadata_path}: duplicate destination: {destination}")
+            destinations.add(str(destination))
+            source = directory / source_relative
+            ensure_within(source, root, "source")
+            if not source.is_file():
+                raise TemplateError(f"{metadata_path}: source does not exist: {source_relative}")
+            files.append({"source": str(source_relative), "destination": str(destination)})
+        if not files:
+            raise TemplateError(f"{metadata_path}: files must not be empty")
         return cls(name, metadata["description"], metadata["version"], directory,
-                   tuple(markers), metadata["variables"], tuple(files))
+                   tuple(markers), variables, tuple(files))
 
     def values(self, supplied: dict[str, str]):
         unknown = sorted(set(supplied) - set(self.variables))
@@ -65,8 +108,6 @@ class WorkflowTemplate:
             raise TemplateError(f"unknown variables: {', '.join(unknown)}")
         values = {}
         for name, spec in self.variables.items():
-            if not isinstance(spec, dict):
-                raise TemplateError(f"{self.name}: invalid variable metadata for {name}")
             value = supplied.get(name, spec.get("default"))
             if value is None and spec.get("required", False):
                 raise TemplateError(f"missing required variable: {name}")
@@ -75,24 +116,44 @@ class WorkflowTemplate:
 
     def render(self, output: Path, supplied: dict[str, str], force: bool = False):
         values = self.values(supplied)
+        output_root = output.resolve(strict=False)
+        if output.exists() and not output.is_dir():
+            raise TemplateError(f"output is not a directory: {output}")
         rendered = []
         for item in self.files:
-            source = (self.directory / item["source"]).read_text(encoding="utf-8")
+            source_path = self.directory / item["source"]
+            source = source_path.read_text(encoding="utf-8")
+            stripped = TOKEN.sub("", source)
+            if "{{" in stripped or "}}" in stripped:
+                raise TemplateError(f"{item['source']}: malformed template variable")
             tokens = set(TOKEN.findall(source))
             missing = sorted(tokens - values.keys())
             if missing:
                 raise TemplateError(f"{item['source']}: undeclared variables: {', '.join(missing)}")
             content = TOKEN.sub(lambda match: values[match.group(1)], source)
-            if TOKEN.search(content):
-                raise TemplateError(f"{item['source']}: unresolved variables")
             target = output / item["destination"]
+            ensure_within(target, output_root, "destination")
+            ensure_within(target.parent, output_root, "destination parent")
+            if target.exists() and target.is_dir():
+                raise TemplateError(f"destination is a directory: {target}")
             if target.exists() and not force:
                 raise TemplateError(f"refusing to overwrite {target}")
             rendered.append((target, content))
-        for target, content in rendered:
-            target.parent.mkdir(parents=True, exist_ok=True)
-            target.write_text(content, encoding="utf-8")
-        return [target for target, _ in rendered]
+
+        staged = []
+        try:
+            for target, content in rendered:
+                target.parent.mkdir(parents=True, exist_ok=True)
+                with tempfile.NamedTemporaryFile("w", encoding="utf-8", dir=target.parent,
+                                                 prefix=f".{target.name}.", delete=False) as handle:
+                    handle.write(content)
+                    staged.append((Path(handle.name), target))
+            for temporary, target in staged:
+                os.replace(temporary, target)
+            return [target for _, target in staged]
+        finally:
+            for temporary, _ in staged:
+                temporary.unlink(missing_ok=True)
 
 
 class TemplateManager:
@@ -131,7 +192,7 @@ def parse_variables(items):
         if "=" not in item:
             raise TemplateError(f"variable must be NAME=VALUE: {item}")
         name, value = item.split("=", 1)
-        if not re.fullmatch(r"[a-z][a-z0-9_]*", name) or name in values:
+        if not VARIABLE.fullmatch(name) or name in values:
             raise TemplateError(f"invalid or duplicate variable: {name}")
         values[name] = value
     return values
