@@ -1,0 +1,17 @@
+{
+  "name": "hyprland",
+  "description": "Hyprland configuration change with backup, reload, and rollback gates",
+  "version": "1.0.0",
+  "markers": ["hyprland.conf", ".config/hypr/hyprland.conf", "hypr/*.conf", ".config/hypr/*.conf"],
+  "variables": {
+    "title": {"required": true},
+    "goal": {"required": true},
+    "allowed_files": {"default": "~/.config/hypr/**"},
+    "backup_path": {"required": true}
+  },
+  "files": [
+    {"source": "PLAN.md.tmpl", "destination": "PLAN.md"},
+    {"source": "TASKS.md.tmpl", "destination": "TASKS.md"},
+    {"source": "ACCEPTANCE.md.tmpl", "destination": "ACCEPTANCE.md"}
+  ]
+}
