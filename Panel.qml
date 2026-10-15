@@ -2,8 +2,7 @@ import QtQuick
 import QtQuick.Layouts
 import Quickshell
 import Quickshell.Wayland
-import qs.Commons
-import qs.Ui
+import qs.Commons as Commons
 
 // Agent setup: a small centered card with the setup's four entry points. Each
 // button hands off to a command and closes the card, so nothing here runs
@@ -18,29 +17,37 @@ Item {
 
   property bool opened: false
 
+  // Follow Setup > Language live. Missing Czech strings fall back to English.
+  Commons.Translations {
+    id: strings
+    directory: Qt.resolvedUrl("i18n")
+  }
+
   // The plugin's own checkout, so the actions work wherever it was installed.
   readonly property string pluginDir: String(Qt.resolvedUrl(".")).replace(/^file:\/\//, "").replace(/\/$/, "")
 
+  // IDs, paths, commands, and catalog keys stay stable. Translation happens
+  // only in the Text bindings below, so a language switch re-renders the UI.
   readonly property var actions: [
     {
-      title: "Research workspace",
-      detail: "Open Perplexity and Gemini side by side on their own workspace",
+      titleKey: "action.research.title",
+      detailKey: "action.research.detail",
       command: ["bash", pluginDir + "/workspace/research-workspace.sh"]
     },
     {
-      title: "Plan with agents",
-      detail: "Start your default agent as the orchestrator, following the contracts",
+      titleKey: "action.plan.title",
+      detailKey: "action.plan.detail",
       command: ["omarchy-agent-prompt", "Read " + pluginDir + "/AGENTS.md and " + pluginDir
         + "/prompts/orchestrator-claude.md, then act as the orchestrator for this project."]
     },
     {
-      title: "No-extra-payment audit",
-      detail: "Check nothing can bill you before agents run",
+      titleKey: "action.audit.title",
+      detailKey: "action.audit.detail",
       command: ["xdg-open", pluginDir + "/docs/no-extra-payment-audit.md"]
     },
     {
-      title: "Research dispatcher notes",
-      detail: "How research jobs become browser tasks for Codex",
+      titleKey: "action.notes.title",
+      detailKey: "action.notes.detail",
       command: ["xdg-open", pluginDir + "/research/README.md"]
     }
   ]
@@ -99,14 +106,18 @@ Item {
         ColumnLayout {
           id: content
           anchors.fill: parent
-          spacing: Style.space(12)
+          spacing: Commons.Style.space(12)
+          LayoutMirroring.enabled: Commons.I18n.rightToLeft
+          LayoutMirroring.childrenInherit: true
 
           Text {
-            text: "AGENT SETUP"
+            text: strings.t("panel.title")
+            textFormat: Text.PlainText
             color: Qt.rgba(1, 1, 1, 0.55)
-            font.family: Style.font.family
-            font.pixelSize: Style.font.caption
+            font.family: Commons.Style.font.family
+            font.pixelSize: Commons.Style.font.caption
             font.bold: true
+            font.capitalization: Font.AllUppercase
             font.letterSpacing: 2
             Layout.alignment: Qt.AlignHCenter
           }
@@ -117,30 +128,34 @@ Item {
             Rectangle {
               required property var modelData
 
-              Layout.preferredWidth: Style.space(360)
-              implicitHeight: label.implicitHeight + Style.space(24)
-              radius: Style.cornerRadius
+              Layout.preferredWidth: Commons.Style.space(360)
+              implicitHeight: label.implicitHeight + Commons.Style.space(24)
+              radius: Commons.Style.cornerRadius
               color: area.containsMouse ? Qt.rgba(1, 1, 1, 0.16) : Qt.rgba(1, 1, 1, 0.08)
 
               ColumnLayout {
                 id: label
                 anchors.fill: parent
-                anchors.margins: Style.space(12)
-                spacing: Style.space(2)
+                anchors.margins: Commons.Style.space(12)
+                spacing: Commons.Style.space(2)
 
                 Text {
-                  text: modelData.title
+                  text: strings.t(modelData.titleKey)
+                  textFormat: Text.PlainText
                   color: "white"
-                  font.family: Style.font.family
-                  font.pixelSize: Style.font.body
+                  font.family: Commons.Style.font.family
+                  font.pixelSize: Commons.Style.font.body
                   font.bold: true
+                  wrapMode: Text.Wrap
+                  Layout.fillWidth: true
                 }
 
                 Text {
-                  text: modelData.detail
+                  text: strings.t(modelData.detailKey)
+                  textFormat: Text.PlainText
                   color: Qt.rgba(1, 1, 1, 0.65)
-                  font.family: Style.font.family
-                  font.pixelSize: Style.font.bodySmall
+                  font.family: Commons.Style.font.family
+                  font.pixelSize: Commons.Style.font.bodySmall
                   wrapMode: Text.Wrap
                   Layout.fillWidth: true
                 }
