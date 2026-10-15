@@ -1,46 +1,54 @@
-# Agent setup (Omarchy plugin)
+# Omarchy Agent Setup
 
-An [Omarchy](https://omarchy.org) shell plugin and a set of working files for running several coding agents together: Claude orchestrates, Codex executes, Grok evaluates, and Gemini is the fallback, with a browser research workspace.
+A reviewed Omarchy plugin plus the local agent workflow used to build it. It brings the research workspace, browser automation, research dispatcher, agent handoffs, quota fallback, and payment audit from this repository into one installable package.
 
 ## Install
 
 ```bash
-omarchy plugin add https://github.com/sparesparrow/omarchy-agent-setup.git
-omarchy plugin enable sparesparrow.agent-setup
-omarchy-shell shell summon sparesparrow.agent-setup '{}'
+omarchy-plugin-install https://github.com/sparesparrow/omarchy-agent-setup
 ```
 
-Plugins run as unsandboxed code inside the Omarchy shell and land disabled so you can read them first. This one only launches the commands listed below when you click a button.
+Omarchy installs it as `omarchy-agent-setup`. If you already installed an older checkout under another name, remove that copy before installing this one.
 
-## What is in it
+After installation, reload the shell (`Super + Ctrl + R`), open **Install > Plugin**, enable **Agent Setup**, then add the panel to your bar.
+
+Plugins run as unsandboxed code inside the Omarchy shell and land disabled so you can review them first. Read `Panel.qml`, `workspace/`, `browser/`, and `research/` before enabling or running their commands.
+
+## What is included
 
 - `Panel.qml` and `manifest.json` - the plugin: a card with four actions (research workspace, plan with agents, payment audit, dispatcher notes).
 - `i18n/` - plugin-owned English and Czech catalogs that follow Omarchy's selected language live.
 - `AGENTS.md`, `prompts/`, `templates/` - the orchestrator, executor, and evaluator contracts, role prompts, and handoff templates.
   Their role separation and evidence handoff selectively adapt the portable agent pattern from `sparesparrow/mia`; see `docs/mia-agent-patterns.md`.
+- `prompt-catalog/` - a local, versioned, searchable prompt catalog with strict variable rendering, adapted from `sparesparrow/mcp-prompts` without a server, database, cloud account, or payment tier.
 - `workspace/` - a Hyprland research workspace with Perplexity and Gemini as separate web apps.
 - `browser/` - Playwright MCP setup for Codex, with a safety note.
 - `research/` - a dispatcher that turns a `dispatch.yaml` into research jobs.
+- `orchestration/` and `project-templates/` - dependency-free discovery and rendering of repo-aware Python, embedded, and Hyprland workflow contracts, adapted from `sparesparrow/mcp-project-orchestrator`.
 - `docs/no-extra-payment-audit.md` - a checklist to make sure no agent can bill you.
 
 ## Localization
 
-The panel uses Omarchy's official `Commons.Translations` API. English is the complete source catalog in `i18n/en.json`, and Czech is the first native-review catalog in `i18n/cs.json`. Missing languages or strings fall back to English; changing **Setup > Language** updates QML bindings without restarting the shell.
+The panel loads `i18n/en.json` and `i18n/cs.json` through Omarchy's `Commons.Translations`. Omarchy selects the matching language, falls back to English, and updates text bindings while the panel is open.
 
-Keep IDs, translation keys, commands, paths, URLs, JSON fields, and provider names stable. Translate only visible labels and explanations. Add another language as `i18n/<Omarchy-language-code>.json` with exactly the same keys as `en.json`.
+Add new visible plugin text to both catalogs and reference it with `Translations.tr("key")`. Do not translate command IDs, process arguments, paths, service names, provider names, or handoff filenames. Keep every rendered plugin text item on `Text.PlainText`; translated strings must never become rich text.
 
-The technical agent contracts remain canonical rather than being copied into 50 translated variants. Agent response-language selection should be passed separately in the task context.
+The technical agent contracts remain canonical rather than being copied into 50 language trees. Add localized operator help only when there is a real reviewed translation workflow for it.
 
-## Check
+## Test
+
+From a checkout on an Omarchy machine:
 
 ```bash
 ./test.sh
 ```
 
-This validates the manifest, parses the scripts, compiles the dispatcher, checks English/Czech catalog parity, checks that every catalog key is referenced, rejects the previous hardcoded panel labels, and requires plain-text rendering for plugin text.
+This validates the manifest, parses the scripts, compiles the Python tools, runs the workflow-template and prompt-catalog unit tests, checks English/Czech catalog parity, checks that every localization key is referenced, rejects previous hardcoded panel labels, and requires plain-text rendering for plugin text.
 
 The panel still needs a running Omarchy shell for live verification. Test both English and Czech, switch between them while the panel is open, and verify that longer Czech labels wrap correctly.
 
-## Status
+## What is not automatic
 
-Nothing here has been run in a live Omarchy shell yet. The panel's QML is modeled on the shell's built-in panels but is unverified, and the research dispatcher has not been tried against the real apps. See the open issues.
+This repository does not install Codex, Gemini, Grok, or Claude CLIs, log you into services, enable browser MCP, or run agents during plugin installation. Those actions may create security or quota risk and remain explicit user choices.
+
+Run `browser/setup.sh` only after reviewing the Playwright MCP warning. Copy workspace files from `workspace/` only after backing up existing Hyprland configuration.
