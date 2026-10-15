@@ -3,7 +3,9 @@
 
 import argparse
 import json
+import os
 import re
+import tempfile
 from dataclasses import dataclass
 from pathlib import Path, PurePosixPath
 
@@ -32,6 +34,7 @@ class PromptVersion:
     category: str
     tags: tuple[str, ...]
     version: str
+    source_path: str
     source: Path
     variables: dict
 
@@ -55,10 +58,11 @@ class PromptVersion:
             if value is None and spec.get("required", False):
                 raise CatalogError(f"missing required variable: {name}")
             values[name] = "" if value is None else str(value)
-        content = TOKEN.sub(lambda match: values[match.group(1)], self.template())
-        if TOKEN.search(content):
-            raise CatalogError("rendered prompt contains unresolved variables")
-        return content
+        template = self.template()
+        stripped = TOKEN.sub("", template)
+        if "{{" in stripped or "}}" in stripped:
+            raise CatalogError(f"{self.prompt_id}: malformed template variable")
+        return TOKEN.sub(lambda match: values[match.group(1)], template)
 
     def metadata(self):
         return {
@@ -68,7 +72,7 @@ class PromptVersion:
             "category": self.category,
             "tags": list(self.tags),
             "version": self.version,
-            "source": str(self.source),
+            "source": self.source_path,
             "variables": self.variables,
         }
 
@@ -84,7 +88,9 @@ class PromptCatalog:
             data = json.loads(self.catalog_path.read_text(encoding="utf-8"))
         except (OSError, json.JSONDecodeError) as error:
             raise CatalogError(f"cannot load {self.catalog_path}: {error}") from error
-        if data.get("schema_version") != 1 or not isinstance(data.get("prompts"), list):
+        if not isinstance(data, dict) or set(data) != {"schema_version", "prompts"}:
+            raise CatalogError("catalog requires exactly schema_version and prompts")
+        if data["schema_version"] != 1 or not isinstance(data["prompts"], list):
             raise CatalogError("catalog requires schema_version 1 and a prompts list")
         entries = {}
         for raw in data["prompts"]:
@@ -102,15 +108,17 @@ class PromptCatalog:
         required = {"id", "name", "description", "category", "tags", "version", "source", "variables"}
         if not isinstance(raw, dict) or set(raw) != required:
             raise CatalogError("every prompt must contain exactly the documented metadata fields")
-        if not PROMPT_ID.fullmatch(raw["id"]):
+        if not isinstance(raw["id"], str) or not PROMPT_ID.fullmatch(raw["id"]):
             raise CatalogError(f"invalid prompt id: {raw['id']!r}")
-        if not VERSION.fullmatch(raw["version"]):
+        if not isinstance(raw["version"], str) or not VERSION.fullmatch(raw["version"]):
             raise CatalogError(f"invalid semantic version: {raw['version']!r}")
         for field in ("name", "description", "category"):
             if not isinstance(raw[field], str) or not raw[field].strip():
                 raise CatalogError(f"{raw['id']}: {field} must be a non-empty string")
-        if not isinstance(raw["tags"], list) or not all(isinstance(tag, str) and tag for tag in raw["tags"]):
-            raise CatalogError(f"{raw['id']}: tags must be non-empty strings")
+        if not isinstance(raw["tags"], list) or not raw["tags"] or not all(
+            isinstance(tag, str) and tag.strip() for tag in raw["tags"]
+        ):
+            raise CatalogError(f"{raw['id']}: tags must be a non-empty list of non-empty strings")
         if len(raw["tags"]) != len(set(raw["tags"])):
             raise CatalogError(f"{raw['id']}: tags must be unique")
         source_relative = safe_relative_path(raw["source"], "source")
@@ -125,7 +133,7 @@ class PromptCatalog:
         if not isinstance(variables, dict):
             raise CatalogError(f"{raw['id']}: variables must be an object")
         for name, spec in variables.items():
-            if not VARIABLE.fullmatch(name) or not isinstance(spec, dict):
+            if not isinstance(name, str) or not VARIABLE.fullmatch(name) or not isinstance(spec, dict):
                 raise CatalogError(f"{raw['id']}: invalid variable {name!r}")
             if set(spec) - {"required", "default", "description"}:
                 raise CatalogError(f"{raw['id']}: unsupported metadata for variable {name}")
@@ -133,13 +141,19 @@ class PromptCatalog:
                 raise CatalogError(f"{raw['id']}: required must be boolean for {name}")
             if spec.get("required") and "default" in spec:
                 raise CatalogError(f"{raw['id']}: required variable {name} cannot have a default")
-        tokens = set(TOKEN.findall(source.read_text(encoding="utf-8")))
+            if "description" in spec and (not isinstance(spec["description"], str) or not spec["description"].strip()):
+                raise CatalogError(f"{raw['id']}: description must be a non-empty string for {name}")
+        template = source.read_text(encoding="utf-8")
+        stripped = TOKEN.sub("", template)
+        if "{{" in stripped or "}}" in stripped:
+            raise CatalogError(f"{raw['id']}: malformed template variable")
+        tokens = set(TOKEN.findall(template))
         if tokens != set(variables):
             raise CatalogError(
                 f"{raw['id']}: source variables differ; source={sorted(tokens)}, metadata={sorted(variables)}"
             )
         return PromptVersion(raw["id"], raw["name"], raw["description"], raw["category"],
-                             tuple(raw["tags"]), raw["version"], source, variables)
+                             tuple(raw["tags"]), raw["version"], str(source_relative), source, variables)
 
     def get(self, prompt_id, version=None):
         candidates = [entry for (entry_id, _), entry in self.entries.items() if entry_id == prompt_id]
@@ -179,10 +193,21 @@ def parse_variables(items):
 
 
 def write_output(path, content, force):
+    if path.exists() and path.is_dir():
+        raise CatalogError(f"output is a directory: {path}")
     if path.exists() and not force:
         raise CatalogError(f"refusing to overwrite {path}")
     path.parent.mkdir(parents=True, exist_ok=True)
-    path.write_text(content, encoding="utf-8")
+    temporary = None
+    try:
+        with tempfile.NamedTemporaryFile("w", encoding="utf-8", dir=path.parent,
+                                         prefix=f".{path.name}.", delete=False) as handle:
+            handle.write(content)
+            temporary = Path(handle.name)
+        os.replace(temporary, path)
+    finally:
+        if temporary is not None:
+            temporary.unlink(missing_ok=True)
 
 
 def main(argv=None):
