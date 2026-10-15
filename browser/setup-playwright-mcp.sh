@@ -1,5 +1,6 @@
-#!/usr/bin/env bash
-# Register a visible Playwright MCP browser with its own persistent profile.
+#!/bin/bash
+# Registers the Playwright MCP server with Codex. Browser stays visible (headed)
+# so you can log in or solve CAPTCHAs manually.
 set -euo pipefail
 
 for tool in node npx codex; do
