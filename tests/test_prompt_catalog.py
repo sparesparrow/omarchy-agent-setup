@@ -20,7 +20,10 @@ class PromptCatalogTests(unittest.TestCase):
     def test_catalog_filters_and_latest_lookup(self):
         catalog = self.load()
         self.assertEqual("1.0.0", catalog.get("role.evaluator").version)
-        self.assertEqual(["role.evaluator"], [item.prompt_id for item in catalog.list(category="role", tag="evidence")])
+        self.assertEqual(
+            ["role.evaluator", "role.executor"],
+            [item.prompt_id for item in catalog.list(category="role", tag="evidence")],
+        )
 
     def test_render_defaults_and_rejects_unknown_values(self):
         entry = self.load().get("workflow.task-brief")
