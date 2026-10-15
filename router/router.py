@@ -46,13 +46,42 @@ def save(s):
     STATE.write_text(json.dumps(s, indent=2), encoding="utf-8")
 
 
+def parse_until(value):
+    """Parse an ISO-8601 reset time and normalize it to UTC."""
+    try:
+        parsed = datetime.fromisoformat(value)
+    except (TypeError, ValueError):
+        raise ValueError(f"invalid --until value {value!r}; expected ISO-8601 date and time") from None
+    if parsed.tzinfo is None:
+        parsed = parsed.replace(tzinfo=timezone.utc)
+    return parsed.astimezone(timezone.utc)
+
+
+def clear_expired(s):
+    """Remove elapsed quota marks and return the agents made available."""
+    expired = []
+    for agent, until in list(s["exhausted"].items()):
+        if until != "manual" and now() >= parse_until(until):
+            s["exhausted"].pop(agent)
+            expired.append(agent)
+    return expired
+
+
+def manual_reminders(s):
+    return [
+        f"{agent} stays exhausted until cleared with: router.py available {agent}"
+        for agent, until in sorted(s["exhausted"].items())
+        if until == "manual"
+    ]
+
+
 def is_exhausted(s, agent):
     until = s["exhausted"].get(agent)
     if until is None:
         return False
     if until == "manual":
         return True
-    return now() < datetime.fromisoformat(until)
+    return now() < parse_until(until)
 
 
 def claude_eval(s, executor, reason):
@@ -95,17 +124,34 @@ def main(argv):
         sys.exit(__doc__)
     cmd, rest = argv[0], argv[1:]
     s = load()
+    try:
+        if clear_expired(s):
+            save(s)
+    except ValueError as error:
+        sys.exit(f"invalid stored exhaustion time: {error}")
     if cmd in ("exhausted", "available"):
         if not rest or rest[0] not in AGENTS:
             sys.exit(f"agent must be one of {sorted(AGENTS)}")
         agent = rest[0]
         if cmd == "available":
+            if len(rest) != 1:
+                sys.exit("usage: router.py available <agent>")
             s["exhausted"].pop(agent, None)
         else:
-            until = "manual"
-            if "--until" in rest:
-                until = datetime.fromisoformat(rest[rest.index("--until") + 1]).astimezone(timezone.utc).isoformat()
-            s["exhausted"][agent] = until
+            if len(rest) == 1:
+                until = "manual"
+            elif len(rest) == 3 and rest[1] == "--until":
+                try:
+                    reset_at = parse_until(rest[2])
+                except ValueError as error:
+                    sys.exit(str(error))
+                until = reset_at.isoformat()
+            else:
+                sys.exit("usage: router.py exhausted <agent> [--until ISO8601]")
+            if until == "manual" or parse_until(until) > now():
+                s["exhausted"][agent] = until
+            else:
+                s["exhausted"].pop(agent, None)
         save(s)
     elif cmd == "approve":
         if rest != ["claude-eval"]:
@@ -125,6 +171,9 @@ def main(argv):
         print(json.dumps(s, indent=2))
         return
     result = route(s)
+    reminders = manual_reminders(s)
+    if reminders:
+        result["reminders"] = reminders
     if cmd == "route" and result.get("evaluator") == "claude-diff-only" and s.get("claude_eval_approved"):
         s.pop("claude_eval_approved")
         save(s)
