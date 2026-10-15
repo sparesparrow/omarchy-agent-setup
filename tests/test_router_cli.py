@@ -4,6 +4,7 @@ import subprocess
 import sys
 import tempfile
 import unittest
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -41,9 +42,45 @@ class RouterCliTests(unittest.TestCase):
         result = self.run_router("exhausted", "codex")
         self.assertEqual("manual", self.state_data()["exhausted"]["codex"])
         self.assertEqual(
-            {"action": "run", "executor": "gemini", "evaluator": "grok"},
+            {
+                "action": "run",
+                "executor": "gemini",
+                "evaluator": "grok",
+                "reminders": [
+                    "codex stays exhausted until cleared with: router.py available codex"
+                ],
+            },
             self.output_data(result),
         )
+
+    def test_expired_until_makes_agent_available_and_clears_marker(self):
+        expired = (datetime.now(timezone.utc) - timedelta(minutes=1)).isoformat()
+        result = self.run_router("exhausted", "codex", "--until", expired)
+        self.assertNotIn("codex", self.state_data()["exhausted"])
+        self.assertEqual(
+            {"action": "run", "executor": "codex", "evaluator": "grok"},
+            self.output_data(result),
+        )
+
+    def test_future_until_keeps_agent_exhausted_without_manual_reminder(self):
+        future = (datetime.now(timezone.utc) + timedelta(minutes=5)).isoformat()
+        result = self.run_router("exhausted", "codex", "--until", future)
+        output = self.output_data(result)
+        self.assertEqual("gemini", output["executor"])
+        self.assertNotIn("reminders", output)
+
+    def test_invalid_until_reports_clear_error_without_traceback_or_state(self):
+        result = self.run_router("exhausted", "codex", "--until", "tomorrow-ish")
+        self.assertNotEqual(0, result.returncode)
+        self.assertIn("invalid --until value", result.stderr)
+        self.assertNotIn("Traceback", result.stderr)
+        self.assertFalse(self.state.exists())
+
+    def test_missing_until_value_reports_usage_without_traceback(self):
+        result = self.run_router("exhausted", "codex", "--until")
+        self.assertNotEqual(0, result.returncode)
+        self.assertIn("usage: router.py exhausted", result.stderr)
+        self.assertNotIn("Traceback", result.stderr)
 
     def test_available_clears_exhausted_agent(self):
         self.run_router("exhausted", "codex")
