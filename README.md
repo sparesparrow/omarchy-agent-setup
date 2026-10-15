@@ -17,6 +17,7 @@ Plugins run as unsandboxed code inside the Omarchy shell and land disabled so yo
 - `Panel.qml` and `manifest.json` - the plugin: a card with four actions (research workspace, plan with agents, payment audit, dispatcher notes).
 - `i18n/` - plugin-owned English and Czech catalogs that follow Omarchy's selected language live.
 - `AGENTS.md`, `prompts/`, `templates/` - the orchestrator, executor, and evaluator contracts, role prompts, and handoff templates.
+  Their role separation and evidence handoff selectively adapt the portable agent pattern from `sparesparrow/mia`; see `docs/mia-agent-patterns.md`.
 - `workspace/` - a Hyprland research workspace with Perplexity and Gemini as separate web apps.
 - `browser/` - Playwright MCP setup for Codex, with a safety note.
 - `research/` - a dispatcher that turns a `dispatch.yaml` into research jobs.
