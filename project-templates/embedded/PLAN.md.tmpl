@@ -1,0 +1,17 @@
+# Plan: {{ title }}
+
+## Goal
+
+{{ goal }}
+
+## Approach
+
+Keep protocol and pin contracts explicit. Validate host-testable logic first, compile for the declared target, then record hardware-in-the-loop evidence separately.
+
+## Risks
+
+Wrong board or pin assumptions, timing and power behavior hidden by simulation, and protocol incompatibility.
+
+## Out of scope
+
+Hardware actuation or flashing without explicit user authorization.

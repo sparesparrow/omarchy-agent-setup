@@ -1,0 +1,17 @@
+{
+  "name": "python",
+  "description": "Python change with focused tests and static checks",
+  "version": "1.0.0",
+  "markers": ["pyproject.toml", "requirements.txt", "pytest.ini", "setup.py"],
+  "variables": {
+    "title": {"required": true},
+    "goal": {"required": true},
+    "allowed_files": {"required": true},
+    "test_command": {"default": "python3 -m pytest -q"}
+  },
+  "files": [
+    {"source": "PLAN.md.tmpl", "destination": "PLAN.md"},
+    {"source": "TASKS.md.tmpl", "destination": "TASKS.md"},
+    {"source": "ACCEPTANCE.md.tmpl", "destination": "ACCEPTANCE.md"}
+  ]
+}

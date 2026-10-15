@@ -1,0 +1,9 @@
+# Tasks
+
+## Task 1: {{ title }}
+- Owner: executor
+- Allowed files: {{ allowed_files }}
+- Backup: {{ backup_path }}
+- Required tests: `hyprctl reload` and `hyprctl configerrors`
+- Stop conditions: backup fails, config scope expands, or the active session cannot be safely tested
+- Rollback: restore {{ backup_path }} and run `hyprctl reload`

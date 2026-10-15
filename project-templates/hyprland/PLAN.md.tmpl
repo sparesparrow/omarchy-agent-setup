@@ -1,0 +1,17 @@
+# Plan: {{ title }}
+
+## Goal
+
+{{ goal }}
+
+## Approach
+
+Snapshot the affected configuration, make the smallest declarative edit, reload Hyprland, inspect configuration errors, and preserve a one-command rollback.
+
+## Risks
+
+A syntax error can disrupt the active desktop; broad copies can overwrite unrelated local configuration.
+
+## Out of scope
+
+Files outside {{ allowed_files }}, package installation, and destructive replacement of the whole configuration tree.
