@@ -1,0 +1,11 @@
+{
+  "panel.title": "Nastavení agentů",
+  "action.research.title": "Pracovní prostor pro rešerše",
+  "action.research.detail": "Otevře Perplexity a Gemini vedle sebe v samostatném pracovním prostoru",
+  "action.plan.title": "Plánování s agenty",
+  "action.plan.detail": "Spustí výchozího agenta jako koordinátora podle pravidel projektu",
+  "action.audit.title": "Kontrola dodatečných plateb",
+  "action.audit.detail": "Před spuštěním agentů ověří, že vám nic nemůže účtovat poplatky",
+  "action.notes.title": "Poznámky k plánovači rešerší",
+  "action.notes.detail": "Vysvětluje, jak se z rešeršních úloh stávají úlohy pro Codex v prohlížeči"
+}

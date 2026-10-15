@@ -1,0 +1,11 @@
+{
+  "panel.title": "Agent Setup",
+  "action.research.title": "Research Workspace",
+  "action.research.detail": "Open Perplexity and Gemini side by side in their own workspace",
+  "action.plan.title": "Plan with Agents",
+  "action.plan.detail": "Start your default agent as the orchestrator using the project contracts",
+  "action.audit.title": "No-extra-payment Audit",
+  "action.audit.detail": "Check that nothing can bill you before agents run",
+  "action.notes.title": "Research Dispatcher Notes",
+  "action.notes.detail": "Learn how research jobs become browser tasks for Codex"
+}
