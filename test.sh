@@ -11,7 +11,8 @@ for script in browser/*.sh workspace/*.sh; do
   bash -n "$script"
 done
 
-python3 -m py_compile research/dispatcher.py
+python3 -m py_compile research/dispatcher.py orchestration/workflow_templates.py
+python3 -m unittest discover -s tests -p 'test_workflow_templates.py'
 
 for required in \
   "## Claim" \

@@ -21,6 +21,7 @@ Plugins run as unsandboxed code inside the Omarchy shell and land disabled so yo
 - `workspace/` - a Hyprland research workspace with Perplexity and Gemini as separate web apps.
 - `browser/` - Playwright MCP setup for Codex, with a safety note.
 - `research/` - a dispatcher that turns a `dispatch.yaml` into research jobs.
+- `orchestration/` and `project-templates/` - dependency-free discovery and rendering of repo-aware Python, embedded, and Hyprland workflow contracts, adapted from `sparesparrow/mcp-project-orchestrator`.
 - `docs/no-extra-payment-audit.md` - a checklist to make sure no agent can bill you.
 
 ## Localization

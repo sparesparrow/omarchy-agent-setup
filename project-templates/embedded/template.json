@@ -1,0 +1,18 @@
+{
+  "name": "embedded",
+  "description": "Embedded firmware change with host, build, and hardware evidence separated",
+  "version": "1.0.0",
+  "markers": ["platformio.ini", "*.ino", "**/*.ino", "sdkconfig"],
+  "variables": {
+    "title": {"required": true},
+    "goal": {"required": true},
+    "allowed_files": {"required": true},
+    "build_command": {"default": "pio run"},
+    "hardware_check": {"default": "Not scheduled"}
+  },
+  "files": [
+    {"source": "PLAN.md.tmpl", "destination": "PLAN.md"},
+    {"source": "TASKS.md.tmpl", "destination": "TASKS.md"},
+    {"source": "ACCEPTANCE.md.tmpl", "destination": "ACCEPTANCE.md"}
+  ]
+}
