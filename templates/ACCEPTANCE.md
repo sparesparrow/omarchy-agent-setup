@@ -1,6 +1,10 @@
 # Acceptance criteria
 
 - [ ] Behavior:
-- [ ] Tests pass:
+- [ ] Required tests pass:
+- [ ] Claim is no broader than recorded proof
+- [ ] Live UI, hardware and external-service validation is explicitly proven or listed as not proven
 - [ ] No changes outside allowed files
-- [ ] No new secrets, keys or paid dependencies
+- [ ] Rollback is documented and usable
+- [ ] No new secrets, credentials, keys or paid dependencies
+- [ ] Safety boundaries are preserved

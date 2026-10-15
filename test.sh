@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Validates the plugin manifest, localization catalogs, and executable sources.
+# Validates the plugin manifest, localization catalogs, executable sources, and agent contracts.
 
 set -euo pipefail
 cd "$(dirname "$0")"
@@ -12,6 +12,28 @@ for script in browser/*.sh workspace/*.sh; do
 done
 
 python3 -m py_compile research/dispatcher.py
+
+for required in \
+  "## Claim" \
+  "## Proof (exact commands, output or artifacts)" \
+  "## Not proven" \
+  "## Safety boundary" \
+  "## Rollback" \
+  "## Next owner: EVALUATOR | ORCHESTRATOR | USER"; do
+  grep -Fq "$required" templates/HANDOFF.md || { echo "HANDOFF.md missing: $required" >&2; exit 1; }
+done
+
+for required in \
+  "## Verdict: PASS | FAIL" \
+  "## Acceptance checklist" \
+  "## Unverified claims" \
+  "## Next owner: EXECUTOR | ORCHESTRATOR | USER"; do
+  grep -Fq "$required" templates/EVALUATION.md || { echo "EVALUATION.md missing: $required" >&2; exit 1; }
+done
+
+grep -Fq "Do not evaluate or approve your own work" prompts/executor-codex.md
+grep -Fq "Do not edit implementation files" prompts/evaluator-grok.md
+grep -Fq "exactly one executor" prompts/orchestrator-claude.md
 
 python3 - <<'PY'
 import json

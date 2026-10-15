@@ -2,10 +2,20 @@
 
 ## Task
 
-## Changes (files)
-
-## Tests run (exact commands and output)
-
 ## Status: DONE | BLOCKED
 
+## Claim
+
+## Changes (files)
+
+## Proof (exact commands, output or artifacts)
+
+## Not proven
+
+## Safety boundary
+
+## Rollback
+
 ## Notes for evaluator
+
+## Next owner: EVALUATOR | ORCHESTRATOR | USER
