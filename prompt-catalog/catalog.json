@@ -1,0 +1,50 @@
+{
+  "schema_version": 1,
+  "prompts": [
+    {
+      "id": "role.orchestrator",
+      "name": "Claude orchestrator",
+      "description": "Plans bounded work, defines acceptance criteria, and routes ownership.",
+      "category": "role",
+      "tags": ["claude", "planning", "routing"],
+      "version": "1.0.0",
+      "source": "prompts/orchestrator-claude.md",
+      "variables": {}
+    },
+    {
+      "id": "role.executor",
+      "name": "Codex executor",
+      "description": "Implements one bounded task and returns evidence without self-approval.",
+      "category": "role",
+      "tags": ["codex", "implementation", "evidence"],
+      "version": "1.0.0",
+      "source": "prompts/executor-codex.md",
+      "variables": {}
+    },
+    {
+      "id": "role.evaluator",
+      "name": "Grok evaluator",
+      "description": "Independently evaluates acceptance criteria and unsupported claims.",
+      "category": "role",
+      "tags": ["grok", "evaluation", "evidence"],
+      "version": "1.0.0",
+      "source": "prompts/evaluator-grok.md",
+      "variables": {}
+    },
+    {
+      "id": "workflow.task-brief",
+      "name": "Bounded task brief",
+      "description": "Renders a provider-neutral task brief with explicit scope and acceptance evidence.",
+      "category": "workflow",
+      "tags": ["task", "handoff", "evidence"],
+      "version": "1.0.0",
+      "source": "prompt-catalog/templates/task-brief.md.tmpl",
+      "variables": {
+        "goal": {"required": true, "description": "Single bounded outcome"},
+        "allowed_files": {"required": true, "description": "Permitted file paths or globs"},
+        "acceptance": {"required": true, "description": "Observable acceptance criteria"},
+        "response_language": {"default": "English", "description": "Language for the response"}
+      }
+    }
+  ]
+}

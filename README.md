@@ -18,6 +18,7 @@ Plugins run as unsandboxed code inside the Omarchy shell and land disabled so yo
 - `i18n/` - plugin-owned English and Czech catalogs that follow Omarchy's selected language live.
 - `AGENTS.md`, `prompts/`, `templates/` - the orchestrator, executor, and evaluator contracts, role prompts, and handoff templates.
   Their role separation and evidence handoff selectively adapt the portable agent pattern from `sparesparrow/mia`; see `docs/mia-agent-patterns.md`.
+- `prompt-catalog/` - a local, versioned, searchable prompt catalog with strict variable rendering, adapted from `sparesparrow/mcp-prompts` without a server, database, cloud account, or payment tier.
 - `workspace/` - a Hyprland research workspace with Perplexity and Gemini as separate web apps.
 - `browser/` - Playwright MCP setup for Codex, with a safety note.
 - `research/` - a dispatcher that turns a `dispatch.yaml` into research jobs.
@@ -38,7 +39,7 @@ The technical agent contracts remain canonical rather than being copied into 50 
 ./test.sh
 ```
 
-This validates the manifest, parses the scripts, compiles the dispatcher, checks English/Czech catalog parity, checks that every catalog key is referenced, rejects the previous hardcoded panel labels, and requires plain-text rendering for plugin text.
+This validates the manifest, parses the scripts, compiles the Python tools, runs the workflow-template and prompt-catalog unit tests, checks English/Czech catalog parity, checks that every localization key is referenced, rejects previous hardcoded panel labels, and requires plain-text rendering for plugin text.
 
 The panel still needs a running Omarchy shell for live verification. Test both English and Czech, switch between them while the panel is open, and verify that longer Czech labels wrap correctly.
 
