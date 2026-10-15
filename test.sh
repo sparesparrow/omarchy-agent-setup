@@ -18,6 +18,7 @@ for required in \
   "## Proof (exact commands, output or artifacts)" \
   "## Not proven" \
   "## Safety boundary" \
+  "## Rollback" \
   "## Next owner: EVALUATOR | ORCHESTRATOR | USER"; do
   grep -Fq "$required" templates/HANDOFF.md || { echo "HANDOFF.md missing: $required" >&2; exit 1; }
 done
