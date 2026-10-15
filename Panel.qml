@@ -4,7 +4,7 @@ import Quickshell
 import Quickshell.Wayland
 import qs.Commons as Commons
 
-// Agent setup: a small centered card with the setup's four entry points. Each
+// Agent setup: a small centered card with the setup's five entry points. Each
 // button hands off to a command and closes the card, so nothing here runs
 // agents or changes configuration by itself.
 //
@@ -39,6 +39,11 @@ Item {
       detailKey: "action.plan.detail",
       command: ["omarchy-agent-prompt", "Read " + pluginDir + "/AGENTS.md and " + pluginDir
         + "/prompts/orchestrator-claude.md, then act as the orchestrator for this project."]
+    },
+    {
+      titleKey: "action.catalog.title",
+      detailKey: "action.catalog.detail",
+      command: ["xdg-open", pluginDir + "/prompt-catalog/README.md"]
     },
     {
       titleKey: "action.audit.title",

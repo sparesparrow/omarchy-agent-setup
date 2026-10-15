@@ -4,6 +4,8 @@
   "action.research.detail": "Open Perplexity and Gemini side by side in their own workspace",
   "action.plan.title": "Plan with Agents",
   "action.plan.detail": "Start your default agent as the orchestrator using the project contracts",
+  "action.catalog.title": "Prompt Catalog",
+  "action.catalog.detail": "Open the local guide to listing, filtering, inspecting, and rendering prompts",
   "action.audit.title": "No-extra-payment Audit",
   "action.audit.detail": "Check that nothing can bill you before agents run",
   "action.notes.title": "Research Dispatcher Notes",

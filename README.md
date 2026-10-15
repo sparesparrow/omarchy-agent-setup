@@ -16,7 +16,7 @@ Plugins run as unsandboxed code inside the Omarchy shell and land disabled so yo
 
 ## What is included
 
-- `Panel.qml` and `manifest.json` - the plugin: a card with four actions (research workspace, plan with agents, payment audit, dispatcher notes).
+- `Panel.qml` and `manifest.json` - the plugin: a card with five actions (research workspace, plan with agents, prompt catalog, payment audit, dispatcher notes).
 - `i18n/` - plugin-owned English and Czech catalogs that follow Omarchy's selected language live.
 - `AGENTS.md`, `prompts/`, `templates/` - the orchestrator, executor, and evaluator contracts, role prompts, and handoff templates.
   Their role separation and evidence handoff selectively adapt the portable agent pattern from `sparesparrow/mia`; see `docs/mia-agent-patterns.md`.
@@ -26,6 +26,12 @@ Plugins run as unsandboxed code inside the Omarchy shell and land disabled so yo
 - `research/` - a dispatcher that turns a `dispatch.yaml` into research jobs.
 - `orchestration/` and `project-templates/` - dependency-free discovery and rendering of repo-aware Python, embedded, and Hyprland workflow contracts, adapted from `sparesparrow/mcp-project-orchestrator`.
 - `docs/no-extra-payment-audit.md` - a checklist to make sure no agent can bill you.
+
+## Prompt catalog panel entry
+
+Choose **Prompt Catalog** (Czech: **Katalog promptů**) in the panel to open the installed `prompt-catalog/README.md` with the desktop's default Markdown handler. The guide contains commands for listing, filtering, inspecting, and rendering local prompts; run those commands from the plugin checkout.
+
+This entry opens documentation, not an embedded prompt browser. It does not start an MCP server, run a prompt, invoke an agent, or write catalog files.
 
 ## Localization
 

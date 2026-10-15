@@ -4,6 +4,8 @@
   "action.research.detail": "Otevře Perplexity a Gemini vedle sebe v samostatném pracovním prostoru",
   "action.plan.title": "Plánování s agenty",
   "action.plan.detail": "Spustí výchozího agenta jako koordinátora podle pravidel projektu",
+  "action.catalog.title": "Katalog promptů",
+  "action.catalog.detail": "Otevře místní návod k výpisu, filtrování, prohlížení a vyplňování promptů",
   "action.audit.title": "Kontrola dodatečných plateb",
   "action.audit.detail": "Před spuštěním agentů ověří, že vám nic nemůže účtovat poplatky",
   "action.notes.title": "Poznámky k plánovači rešerší",
