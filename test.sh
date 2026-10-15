@@ -11,8 +11,9 @@ for script in browser/*.sh workspace/*.sh; do
   bash -n "$script"
 done
 
-python3 -m py_compile research/dispatcher.py orchestration/workflow_templates.py
-python3 -m unittest discover -s tests -p 'test_workflow_templates.py'
+python3 -m py_compile research/dispatcher.py orchestration/workflow_templates.py orchestration/prompt_catalog.py
+python3 -m unittest discover -s tests -p 'test_*.py'
+python3 orchestration/prompt_catalog.py list >/dev/null
 
 for required in \
   "## Claim" \
