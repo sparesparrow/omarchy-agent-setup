@@ -2,12 +2,16 @@
   "panel.title": "Agent Setup",
   "action.research.title": "Research Workspace",
   "action.research.detail": "Open Perplexity and Gemini side by side in their own workspace",
-  "action.plan.title": "Plan with Agents",
-  "action.plan.detail": "Start your default agent as the orchestrator using the project contracts",
+  "action.openclaw.title": "OpenClaw Orchestrator",
+  "action.openclaw.detail": "Set up OpenClaw interactively in Czech without sending a prompt",
+  "action.voxtype.title": "Voxtype Setup",
+  "action.voxtype.detail": "Install dictation and choose its speech model yourself",
+  "action.plugins.title": "More Plugins",
+  "action.plugins.detail": "Browse the Omarchy plugin catalog and install only confirmed plugins",
+  "action.omp.title": "Oh My Pi Presets",
+  "action.omp.detail": "Prepare role presets for Mia, Libertin, Human Action, and other projects",
   "action.catalog.title": "Prompt Catalog",
-  "action.catalog.detail": "Open the local guide to listing, filtering, inspecting, and rendering prompts",
-  "action.audit.title": "No-extra-payment Audit",
-  "action.audit.detail": "Check that nothing can bill you before agents run",
-  "action.notes.title": "Research Dispatcher Notes",
-  "action.notes.detail": "Learn how research jobs become browser tasks for Codex"
+  "action.catalog.detail": "Open local prompts adapted from mcp-prompts and mcp-project-orchestrator",
+  "action.mcp.title": "MCP Servers and Skills",
+  "action.mcp.detail": "Copy skills and optionally register reviewed MCP servers"
 }

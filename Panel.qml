@@ -4,9 +4,8 @@ import Quickshell
 import Quickshell.Wayland
 import qs.Commons as Commons
 
-// Agent setup: a small centered card with the setup's five entry points. Each
-// button hands off to a command and closes the card, so nothing here runs
-// agents or changes configuration by itself.
+// Agent setup entry points. Each button opens a reviewed local command and
+// closes the card. Setup scripts ask again before installing or writing config.
 //
 // Summon with: omarchy-shell shell summon sparesparrow.agent-setup '{}'
 Item {
@@ -14,20 +13,15 @@ Item {
 
   property var shell: null
   property var manifest: null
-
   property bool opened: false
 
-  // Follow Setup > Language live. Missing Czech strings fall back to English.
   Commons.Translations {
     id: strings
     directory: Qt.resolvedUrl("i18n")
   }
 
-  // The plugin's own checkout, so the actions work wherever it was installed.
   readonly property string pluginDir: String(Qt.resolvedUrl(".")).replace(/^file:\/\//, "").replace(/\/$/, "")
 
-  // IDs, paths, commands, and catalog keys stay stable. Translation happens
-  // only in the Text bindings below, so a language switch re-renders the UI.
   readonly property var actions: [
     {
       titleKey: "action.research.title",
@@ -35,10 +29,24 @@ Item {
       command: ["bash", pluginDir + "/workspace/research-workspace.sh"]
     },
     {
-      titleKey: "action.plan.title",
-      detailKey: "action.plan.detail",
-      command: ["omarchy-agent-prompt", "Read " + pluginDir + "/AGENTS.md and " + pluginDir
-        + "/prompts/orchestrator-claude.md, then act as the orchestrator for this project."]
+      titleKey: "action.openclaw.title",
+      detailKey: "action.openclaw.detail",
+      command: ["bash", pluginDir + "/setup/openclaw-cs.sh"]
+    },
+    {
+      titleKey: "action.voxtype.title",
+      detailKey: "action.voxtype.detail",
+      command: ["bash", pluginDir + "/setup/voxtype.sh"]
+    },
+    {
+      titleKey: "action.plugins.title",
+      detailKey: "action.plugins.detail",
+      command: ["bash", pluginDir + "/setup/plugins.sh"]
+    },
+    {
+      titleKey: "action.omp.title",
+      detailKey: "action.omp.detail",
+      command: ["bash", pluginDir + "/setup/omp-presets.sh"]
     },
     {
       titleKey: "action.catalog.title",
@@ -46,14 +54,9 @@ Item {
       command: ["xdg-open", pluginDir + "/prompt-catalog/README.md"]
     },
     {
-      titleKey: "action.audit.title",
-      detailKey: "action.audit.detail",
-      command: ["xdg-open", pluginDir + "/docs/no-extra-payment-audit.md"]
-    },
-    {
-      titleKey: "action.notes.title",
-      detailKey: "action.notes.detail",
-      command: ["xdg-open", pluginDir + "/research/README.md"]
+      titleKey: "action.mcp.title",
+      detailKey: "action.mcp.detail",
+      command: ["bash", pluginDir + "/setup/mcp-skills.sh"]
     }
   ]
 
@@ -97,15 +100,12 @@ Item {
       id: keyCatcher
       anchors.fill: parent
       focus: true
-
       Keys.onEscapePressed: root.dismiss()
 
       Item {
         anchors.centerIn: parent
         width: content.implicitWidth
         height: content.implicitHeight
-
-        // Swallow clicks so only the scrim outside the card dismisses.
         MouseArea { anchors.fill: parent; onClicked: {} }
 
         ColumnLayout {
@@ -129,10 +129,8 @@ Item {
 
           Repeater {
             model: root.actions
-
             Rectangle {
               required property var modelData
-
               Layout.preferredWidth: Commons.Style.space(360)
               implicitHeight: label.implicitHeight + Commons.Style.space(24)
               radius: Commons.Style.cornerRadius

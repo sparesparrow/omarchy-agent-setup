@@ -2,12 +2,16 @@
   "panel.title": "Nastavení agentů",
   "action.research.title": "Pracovní prostor pro rešerše",
   "action.research.detail": "Otevře Perplexity a Gemini vedle sebe v samostatném pracovním prostoru",
-  "action.plan.title": "Plánování s agenty",
-  "action.plan.detail": "Spustí výchozího agenta jako koordinátora podle pravidel projektu",
+  "action.openclaw.title": "OpenClaw jako koordinátor",
+  "action.openclaw.detail": "Interaktivně česky nastaví OpenClaw a samo nic neodesílá",
+  "action.voxtype.title": "Nastavení Voxtype",
+  "action.voxtype.detail": "Nainstaluje diktování a nechá tě vybrat model řeči",
+  "action.plugins.title": "Další pluginy",
+  "action.plugins.detail": "Ukáže katalog Omarchy pluginů a nainstaluje jen potvrzené",
+  "action.omp.title": "Předvolby Oh My Pi",
+  "action.omp.detail": "Připraví role pro Mia, Libertin, Human Action a další projekty",
   "action.catalog.title": "Katalog promptů",
-  "action.catalog.detail": "Otevře místní návod k výpisu, filtrování, prohlížení a vyplňování promptů",
-  "action.audit.title": "Kontrola dodatečných plateb",
-  "action.audit.detail": "Před spuštěním agentů ověří, že vám nic nemůže účtovat poplatky",
-  "action.notes.title": "Poznámky k plánovači rešerší",
-  "action.notes.detail": "Vysvětluje, jak se z rešeršních úloh stávají úlohy pro Codex v prohlížeči"
+  "action.catalog.detail": "Otevře místní prompty z mcp-prompts a mcp-project-orchestrator",
+  "action.mcp.title": "MCP servery a skills",
+  "action.mcp.detail": "Zkopíruje skills a volitelně zaregistruje ověřené MCP servery"
 }

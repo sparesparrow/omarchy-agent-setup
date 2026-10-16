@@ -2,13 +2,9 @@
   "schemaVersion": 1,
   "id": "sparesparrow.agent-setup",
   "name": "Agent setup",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "author": "sparesparrow",
-  "description": "Multi-agent setup: Claude orchestrates, Codex executes, Grok evaluates, Gemini is the fallback, with a browser research workspace",
-  "kinds": [
-    "panel"
-  ],
-  "entryPoints": {
-    "panel": "Panel.qml"
-  }
+  "description": "Czech interactive setup for OpenClaw, Voxtype, Omarchy plugins, Oh My Pi presets, local prompts, and MCP skills",
+  "kinds": ["panel"],
+  "entryPoints": {"panel": "Panel.qml"}
 }
