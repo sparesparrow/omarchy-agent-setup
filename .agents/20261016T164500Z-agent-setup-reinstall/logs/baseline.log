@@ -1,0 +1,19 @@
+Checkpoint 1 baseline (2026-10-16 CEST; checkout cf681a1e022fce4f7ac3686bdd616ab290768646)
+
+Command: omarchy-plugin-validate .
+Exit: 0
+Observed: plugin manifest valid.
+
+Command: timeout 30s ./test.sh
+Exit: 1
+Observed: existing 36 Python tests passed, then obsolete assertion failed with:
+Panel.qml must use the packaged Quickshell component import
+
+Command: python3 -m unittest discover -s tests -p 'test_*.py'
+Exit: 0 (36 tests)
+
+Diagnosis: the script required legacy qs.components, JsonAdapter, Process/onExited,
+and Translations.tr patterns, while the actual Omarchy implementation uses
+qs.Commons, declarative structured argv, Quickshell.execDetached, and
+Commons.Translations/strings.t(). The test was updated to validate that observed
+runtime contract while preserving coverage.

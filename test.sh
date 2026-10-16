@@ -3,6 +3,7 @@
 # Validates the plugin manifest, localization catalogs, executable sources, and agent contracts.
 
 set -euo pipefail
+export PYTHONDONTWRITEBYTECODE=1
 cd "$(dirname "$0")"
 
 omarchy-plugin-validate .
@@ -11,7 +12,7 @@ for script in browser/*.sh workspace/*.sh; do
   bash -n "$script"
 done
 
-python3 -m py_compile research/dispatcher.py orchestration/handoff_dispatcher.py orchestration/workflow_templates.py orchestration/prompt_catalog.py
+PYTHONPYCACHEPREFIX="${TMPDIR:-/tmp}/omarchy-agent-setup-pycache" python3 -m py_compile research/dispatcher.py orchestration/handoff_dispatcher.py orchestration/workflow_templates.py orchestration/prompt_catalog.py
 python3 -m unittest discover -s tests -p 'test_*.py'
 python3 orchestration/prompt_catalog.py list >/dev/null
 
@@ -37,23 +38,41 @@ grep -Fq "Do not evaluate or approve your own work" prompts/executor-codex.md
 grep -Fq "Do not edit implementation files" prompts/evaluator-grok.md
 grep -Fq "Not proven" AGENTS.md
 
-grep -Fq 'import qs.components' Panel.qml || { echo "Panel.qml must use the packaged Quickshell component import" >&2; exit 1; }
-grep -Fq 'as Components' Panel.qml && { echo "Panel.qml must not use the legacy qs.components alias" >&2; exit 1; }
-
-grep -Fq 'JsonAdapter' Panel.qml || { echo "Panel.qml must parse Process output with JsonAdapter" >&2; exit 1; }
-grep -Fq 'JSON.parse' Panel.qml && { echo "Panel.qml must not call JSON.parse on Process output" >&2; exit 1; }
-
 python3 - <<'PY'
+import json
+import re
 from pathlib import Path
 
-text = Path("Panel.qml").read_text(encoding="utf-8")
-blocks = text.split("Process {")[1:]
-if not blocks:
-    raise SystemExit("Panel.qml has no Process objects")
-for index, block in enumerate(blocks, 1):
-    process = block.split("}", 1)[0]
-    if "onExited" not in process:
-        raise SystemExit(f"Process block {index} must handle onExited")
+panel = Path("Panel.qml").read_text(encoding="utf-8")
+manifest = json.loads(Path("manifest.json").read_text(encoding="utf-8"))
+if manifest.get("entryPoints", {}).get("panel") != "Panel.qml":
+    raise SystemExit("manifest panel entry point must target Panel.qml")
+if "import qs.Commons as Commons" not in panel:
+    raise SystemExit("Panel.qml must use Omarchy's qs.Commons API")
+if "Commons.Translations" not in panel or 'directory: Qt.resolvedUrl("i18n")' not in panel:
+    raise SystemExit("Panel.qml must load translations from its packaged i18n directory")
+if "Quickshell.execDetached(command)" not in panel:
+    raise SystemExit("Panel.qml must execute the structured argument array directly")
+if re.search(r'execDetached\(\s*"|bash\s+-c|shellQuote', panel):
+    raise SystemExit("Panel.qml must not turn action arguments into shell command text")
+if "function open(payloadJson)" not in panel or "function close()" not in panel:
+    raise SystemExit("Panel.qml must implement the shell panel open/close lifecycle")
+if "Keys.onEscapePressed" not in panel or "root.dismiss()" not in panel:
+    raise SystemExit("Panel.qml must support Escape dismissal")
+for target in (
+    "workspace/research-workspace.sh",
+    "AGENTS.md",
+    "prompts/orchestrator-claude.md",
+    "prompt-catalog/README.md",
+    "docs/no-extra-payment-audit.md",
+    "research/README.md",
+):
+    if not Path(target).is_file():
+        raise SystemExit(f"panel action target is missing: {target}")
+for expected in ("action.research.title", "action.plan.title", "action.catalog.title",
+                 "action.audit.title", "action.notes.title"):
+    if expected not in panel:
+        raise SystemExit(f"panel is missing the action key {expected}")
 PY
 
 python3 - <<'PY'
@@ -90,14 +109,15 @@ for name, data in catalogs.items():
             raise SystemExit(f"{name}:{key} must be a non-empty string")
 
 panel = Path("Panel.qml").read_text(encoding="utf-8")
-used = set(re.findall(r'Translations\.tr\("([a-z0-9.]+)"\)', panel))
+used = set(re.findall(r'strings\.t\("([a-z0-9.]+)"\)', panel))
+used.update(re.findall(r'(?:titleKey|detailKey): "([a-z0-9.]+)"', panel))
 if used != source_keys:
     missing = sorted(source_keys - used)
     unknown = sorted(used - source_keys)
     raise SystemExit(f"Panel/catalog key mismatch: unreferenced={missing}, unknown={unknown}")
 
 for key in source_keys:
-    if panel.count(f'Translations.tr("{key}")') != 1:
+    if panel.count(f'"{key}"') != 1:
         raise SystemExit(f"Panel must reference {key} exactly once")
 
 for forbidden in (
