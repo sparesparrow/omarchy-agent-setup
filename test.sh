@@ -8,7 +8,7 @@ cd "$(dirname "$0")"
 
 omarchy-plugin-validate .
 
-for script in browser/*.sh workspace/*.sh; do
+for script in browser/*.sh workspace/*.sh setup/*.sh; do
   bash -n "$script"
 done
 
@@ -59,20 +59,33 @@ if "function open(payloadJson)" not in panel or "function close()" not in panel:
     raise SystemExit("Panel.qml must implement the shell panel open/close lifecycle")
 if "Keys.onEscapePressed" not in panel or "root.dismiss()" not in panel:
     raise SystemExit("Panel.qml must support Escape dismissal")
-for target in (
-    "workspace/research-workspace.sh",
-    "AGENTS.md",
-    "prompts/orchestrator-claude.md",
-    "prompt-catalog/README.md",
-    "docs/no-extra-payment-audit.md",
-    "research/README.md",
-):
-    if not Path(target).is_file():
-        raise SystemExit(f"panel action target is missing: {target}")
-for expected in ("action.research.title", "action.plan.title", "action.catalog.title",
-                 "action.audit.title", "action.notes.title"):
+
+expected_actions = {
+    "action.research.title": ["workspace/research-workspace.sh"],
+    "action.openclaw.title": ["setup/openclaw-cs.sh"],
+    "action.voxtype.title": ["setup/voxtype.sh"],
+    "action.plugins.title": ["setup/plugins.sh"],
+    "action.omp.title": ["setup/omp-presets.sh"],
+    "action.catalog.title": ["prompt-catalog/README.md"],
+    "action.mcp.title": ["setup/mcp-skills.sh"],
+}
+removed_actions = ("action.plan.title", "action.audit.title", "action.notes.title")
+
+for expected, targets in expected_actions.items():
     if expected not in panel:
         raise SystemExit(f"panel is missing the action key {expected}")
+    for target in targets:
+        if not Path(target).is_file():
+            raise SystemExit(f"panel action target is missing: {target}")
+        if target not in panel:
+            raise SystemExit(f"panel does not reference {target}")
+for removed in removed_actions:
+    if removed in panel:
+        raise SystemExit(f"removed panel action is still present: {removed}")
+
+actions = re.findall(r"\{\s*titleKey:.*?\n    \}", panel, re.DOTALL)
+if len(actions) != len(expected_actions):
+    raise SystemExit(f"expected {len(expected_actions)} panel actions, found {len(actions)}")
 PY
 
 python3 - <<'PY'
