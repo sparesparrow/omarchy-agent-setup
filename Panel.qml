@@ -49,6 +49,11 @@ Item {
       command: ["bash", pluginDir + "/setup/omp-presets.sh"]
     },
     {
+      titleKey: "action.mia.title",
+      detailKey: "action.mia.detail",
+      command: ["bash", pluginDir + "/setup/mia-voice.sh"]
+    },
+    {
       titleKey: "action.catalog.title",
       detailKey: "action.catalog.detail",
       command: ["xdg-open", pluginDir + "/prompt-catalog/README.md"]

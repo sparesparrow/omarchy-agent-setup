@@ -14,6 +14,7 @@ EXPECTED_ACTIONS = {
     "action.voxtype.title": 'command: ["bash", pluginDir + "/setup/voxtype.sh"]',
     "action.plugins.title": 'command: ["bash", pluginDir + "/setup/plugins.sh"]',
     "action.omp.title": 'command: ["bash", pluginDir + "/setup/omp-presets.sh"]',
+    "action.mia.title": 'command: ["bash", pluginDir + "/setup/mia-voice.sh"]',
     "action.catalog.title": 'command: ["xdg-open", pluginDir + "/prompt-catalog/README.md"]',
     "action.mcp.title": 'command: ["bash", pluginDir + "/setup/mcp-skills.sh"]',
 }
@@ -63,7 +64,7 @@ class PromptCatalogPanelTests(unittest.TestCase):
                     catalog = json.loads((ROOT / f"i18n/{locale}.json").read_text(encoding="utf-8"))
                     self.assertFalse([key for key in catalog if key.startswith(prefix + ".")])
 
-    def test_all_seven_actions_keep_structured_arguments_and_resolve_local_targets(self):
+    def test_all_eight_actions_keep_structured_arguments_and_resolve_local_targets(self):
         _, actions = panel_actions()
         self.assertEqual(len(actions), len(EXPECTED_ACTIONS))
         for title, command in EXPECTED_ACTIONS.items():

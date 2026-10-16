@@ -3,7 +3,7 @@
 Pipeline: **Claude (orchestrator) -> Codex (executor) -> Grok (evaluator)**.
 Fallback: Gemini/Antigravity replaces Codex or Grok when their free quota is exhausted.
 
-The role separation and evidence handoff adapt the orchestrator, executor and evaluator pattern used by [sparesparrow/mia](https://github.com/sparesparrow/mia). This plugin keeps the portable workflow, not MIA's vehicle domain, ElevenLabs deployment, smart-home tools or entertainment personas.
+The role separation and evidence handoff adapt the orchestrator, executor and evaluator pattern used by [sparesparrow/mia](https://github.com/sparesparrow/mia). This plugin keeps the portable workflow, not MIA's vehicle domain, ElevenLabs deployment, smart-home tools or entertainment personas. The one exception is the opt-in MIA voice console (`setup/mia-voice-console.py`): it only sends the button commands MIA permits a console to send, to an endpoint the user supplies, and it must never claim to control the vehicle.
 
 ## Role boundaries
 

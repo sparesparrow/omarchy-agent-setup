@@ -12,7 +12,7 @@ for script in browser/*.sh workspace/*.sh setup/*.sh; do
   bash -n "$script"
 done
 
-PYTHONPYCACHEPREFIX="${TMPDIR:-/tmp}/omarchy-agent-setup-pycache" python3 -m py_compile research/dispatcher.py orchestration/handoff_dispatcher.py orchestration/workflow_templates.py orchestration/prompt_catalog.py
+PYTHONPYCACHEPREFIX="${TMPDIR:-/tmp}/omarchy-agent-setup-pycache" python3 -m py_compile research/dispatcher.py orchestration/handoff_dispatcher.py orchestration/workflow_templates.py orchestration/prompt_catalog.py setup/mia-voice-console.py
 python3 -m unittest discover -s tests -p 'test_*.py'
 python3 orchestration/prompt_catalog.py list >/dev/null
 
@@ -66,6 +66,7 @@ expected_actions = {
     "action.voxtype.title": ["setup/voxtype.sh"],
     "action.plugins.title": ["setup/plugins.sh"],
     "action.omp.title": ["setup/omp-presets.sh"],
+    "action.mia.title": ["setup/mia-voice.sh"],
     "action.catalog.title": ["prompt-catalog/README.md"],
     "action.mcp.title": ["setup/mcp-skills.sh"],
 }

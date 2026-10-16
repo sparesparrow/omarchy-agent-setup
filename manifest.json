@@ -2,9 +2,9 @@
   "schemaVersion": 1,
   "id": "sparesparrow.agent-setup",
   "name": "Agent setup",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "author": "sparesparrow",
-  "description": "Czech interactive setup for OpenClaw, Voxtype, Omarchy plugins, Oh My Pi presets, local prompts, and MCP skills",
+  "description": "Czech interactive setup for OpenClaw, Voxtype, Omarchy plugins, Oh My Pi presets, local prompts, MCP skills, and a MIA voice console",
   "kinds": ["panel"],
   "entryPoints": {"panel": "Panel.qml"}
 }
