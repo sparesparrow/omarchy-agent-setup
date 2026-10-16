@@ -1,50 +1,15 @@
 {
   "schema_version": 1,
   "prompts": [
-    {
-      "id": "role.orchestrator",
-      "name": "Claude orchestrator",
-      "description": "Plans bounded work, defines acceptance criteria, and routes ownership.",
-      "category": "role",
-      "tags": ["claude", "planning", "routing"],
-      "version": "1.0.0",
-      "source": "prompts/orchestrator-claude.md",
-      "variables": {}
-    },
-    {
-      "id": "role.executor",
-      "name": "Codex executor",
-      "description": "Implements one bounded task and returns evidence without self-approval.",
-      "category": "role",
-      "tags": ["codex", "implementation", "evidence"],
-      "version": "1.0.0",
-      "source": "prompts/executor-codex.md",
-      "variables": {}
-    },
-    {
-      "id": "role.evaluator",
-      "name": "Grok evaluator",
-      "description": "Independently evaluates acceptance criteria and unsupported claims.",
-      "category": "role",
-      "tags": ["grok", "evaluation", "evidence"],
-      "version": "1.0.0",
-      "source": "prompts/evaluator-grok.md",
-      "variables": {}
-    },
-    {
-      "id": "workflow.task-brief",
-      "name": "Bounded task brief",
-      "description": "Renders a provider-neutral task brief with explicit scope and acceptance evidence.",
-      "category": "workflow",
-      "tags": ["task", "handoff", "evidence"],
-      "version": "1.0.0",
-      "source": "prompt-catalog/templates/task-brief.md.tmpl",
-      "variables": {
-        "goal": {"required": true, "description": "Single bounded outcome"},
-        "allowed_files": {"required": true, "description": "Permitted file paths or globs"},
-        "acceptance": {"required": true, "description": "Observable acceptance criteria"},
-        "response_language": {"default": "English", "description": "Language for the response"}
-      }
-    }
+    {"id": "role.orchestrator", "name": "Claude orchestrator", "description": "Plans bounded work, defines acceptance criteria, and routes ownership.", "category": "role", "tags": ["claude", "planning", "routing"], "version": "1.0.0", "source": "prompts/orchestrator-claude.md", "variables": {}},
+    {"id": "role.executor", "name": "Codex executor", "description": "Implements one bounded task and returns evidence without self-approval.", "category": "role", "tags": ["codex", "implementation", "evidence"], "version": "1.0.0", "source": "prompts/executor-codex.md", "variables": {}},
+    {"id": "role.evaluator", "name": "Grok evaluator", "description": "Independently evaluates acceptance criteria and unsupported claims.", "category": "role", "tags": ["grok", "evaluation", "evidence"], "version": "1.0.0", "source": "prompts/evaluator-grok.md", "variables": {}},
+    {"id": "workflow.task-brief", "name": "Bounded task brief", "description": "Renders a provider-neutral task brief with explicit scope and acceptance evidence.", "category": "workflow", "tags": ["task", "handoff", "evidence"], "version": "1.0.0", "source": "prompt-catalog/templates/task-brief.md.tmpl", "variables": {"goal": {"required": true, "description": "Single bounded outcome"}, "allowed_files": {"required": true, "description": "Permitted file paths or globs"}, "acceptance": {"required": true, "description": "Observable acceptance criteria"}, "response_language": {"default": "English", "description": "Language for the response"}}},
+    {"id": "openclaw.agent-router", "name": "OpenClaw agent router", "description": "Routes one request to an OpenClaw agent without executing it.", "category": "openclaw", "tags": ["openclaw", "routing"], "version": "1.0.0", "source": "prompt-catalog/templates/openclaw-agent-router.md.tmpl", "variables": {"user_message": {"required": true, "description": "Request to route"}, "current_agent": {"required": true, "description": "Current agent id"}, "available_agents": {"required": true, "description": "Available agent ids"}, "channel": {"required": true, "description": "Source channel"}}},
+    {"id": "project.mia", "name": "Mia project preset", "description": "Bounds work to the portable Mia evidence workflow.", "category": "project", "tags": ["mia", "evidence"], "version": "1.0.0", "source": "prompt-catalog/templates/project-mia.md.tmpl", "variables": {"goal": {"required": true, "description": "Bounded outcome"}, "allowed_files": {"required": true, "description": "Permitted files"}}},
+    {"id": "project.libertin", "name": "Libertin project preset", "description": "Bounds client work and forbids credential or personal-data logging.", "category": "project", "tags": ["libertin", "privacy"], "version": "1.0.0", "source": "prompt-catalog/templates/project-libertin.md.tmpl", "variables": {"goal": {"required": true, "description": "Bounded outcome"}, "allowed_files": {"required": true, "description": "Permitted files"}}},
+    {"id": "project.human-action", "name": "Human Action project preset", "description": "Bounds Czech translation pipeline work without copying book text.", "category": "project", "tags": ["human-action", "translation"], "version": "1.0.0", "source": "prompt-catalog/templates/project-human-action.md.tmpl", "variables": {"goal": {"required": true, "description": "Bounded outcome"}, "allowed_files": {"required": true, "description": "Permitted files"}}},
+    {"id": "workflow.project-orchestration", "name": "Project orchestration", "description": "Selects a local project template without executing it.", "category": "workflow", "tags": ["orchestrator", "template"], "version": "1.0.0", "source": "prompt-catalog/templates/project-orchestration.md.tmpl", "variables": {"project": {"required": true, "description": "Project name"}, "category": {"required": true, "description": "Project category"}}},
+    {"id": "setup.mcp-skills", "name": "MCP and skills setup", "description": "Describes a confirmed skill copy without printing secrets.", "category": "setup", "tags": ["mcp", "skills"], "version": "1.0.0", "source": "prompt-catalog/templates/mcp-skills.md.tmpl", "variables": {"client": {"required": true, "description": "codex, claude, or grok"}, "skill": {"required": true, "description": "Skill directory name"}}}
   ]
 }

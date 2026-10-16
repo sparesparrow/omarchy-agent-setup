@@ -1,0 +1,10 @@
+# OpenClaw agent router
+
+Adapted from sparesparrow/mcp-prompts prompt openclaw-agent-router. Route the request; do not execute it.
+
+Request: {{ user_message }}
+Current agent: {{ current_agent }}
+Available agents: {{ available_agents }}
+Channel: {{ channel }}
+
+Prefer the current agent when it can handle the task. Use a specialist only when the capability is clearly required. Reply with ROUTE and one-sentence REASON.
