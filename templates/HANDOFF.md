@@ -14,6 +14,8 @@
 
 ## Safety boundary
 
+## Upstream (external URLs, paths and plugin IDs; verified or unverified)
+
 ## Rollback
 
 ## Notes for evaluator
