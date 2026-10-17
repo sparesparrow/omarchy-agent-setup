@@ -18,6 +18,7 @@ Znovu načti shell, zapni **Nastavení agentů** a před spuštěním akce si pr
 - OpenClaw se nastavuje interaktivně česky a samo nic neodesílá.
 - Voxtype nainstaluje diktování a model stáhne až po potvrzení.
 - Katalog pluginů nainstaluje jen potvrzené pluginy a nezapne je bez dalšího souhlasu.
+- Ekosystém Hermes a Omarchy po jednotlivých potvrzeních nainstaluje Infomarchy (bez zapnutí), Hermes Agent, most témat Omatchy a Herald OS. Instalační skripty i PKGBUILD se před spuštěním nabídnou k prohlédnutí.
 - Předvolby Oh My Pi připraví role pro Mia, Libertin, Human Action a další projekty. Nevybírají placený model.
 - Hlasová konzole MIA posílá jen povolená tlačítka a ukazuje stav simulovaného stroje.
 - Katalog promptů otevře místní prompty z `mcp-prompts` a `mcp-project-orchestrator`.
