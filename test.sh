@@ -49,16 +49,26 @@ if manifest.get("entryPoints", {}).get("panel") != "Panel.qml":
     raise SystemExit("manifest panel entry point must target Panel.qml")
 if "import qs.Commons as Commons" not in panel:
     raise SystemExit("Panel.qml must use Omarchy's qs.Commons API")
-if "Commons.Translations" not in panel or 'directory: Qt.resolvedUrl("i18n")' not in panel:
-    raise SystemExit("Panel.qml must load translations from its packaged i18n directory")
+if "import Quickshell.Io" not in panel or 'Qt.resolvedUrl("i18n/en.json")' not in panel or 'Qt.resolvedUrl("i18n/cs.json")' not in panel:
+    raise SystemExit("Panel.qml must load both packaged localization catalogs with Quickshell.Io")
 if "Quickshell.execDetached(command)" not in panel:
     raise SystemExit("Panel.qml must execute the structured argument array directly")
 if re.search(r'execDetached\(\s*"|bash\s+-c|shellQuote', panel):
     raise SystemExit("Panel.qml must not turn action arguments into shell command text")
 if "function open(payloadJson)" not in panel or "function close()" not in panel:
     raise SystemExit("Panel.qml must implement the shell panel open/close lifecycle")
-if "Keys.onEscapePressed" not in panel or "root.dismiss()" not in panel:
+if "PanelWindow {" not in panel or "WlrLayershell.layer: WlrLayer.Overlay" not in panel:
+    raise SystemExit("Panel.qml must use Omarchy's supported overlay PanelWindow")
+if "OverlayWindow {" in panel:
+    raise SystemExit("Panel.qml must not use the unsupported OverlayWindow type")
+if "Qt.Key_Escape" not in panel or "root.dismiss()" not in panel:
     raise SystemExit("Panel.qml must support Escape dismissal")
+if 'root.language = "en"' not in panel or 'root.language = "cs"' not in panel:
+    raise SystemExit("Panel.qml must support live English/Czech switching")
+if "function activateFocused()" not in panel or "root.moveFocus(1)" not in panel:
+    raise SystemExit("Panel.qml must make its language and action controls keyboard-operable")
+if 'color: Qt.rgba(0.07, 0.07, 0.07, 0.98)' not in panel:
+    raise SystemExit("Panel.qml must keep desktop content from bleeding through the action card")
 
 expected_actions = {
     "action.research.title": ["workspace/research-workspace.sh"],
@@ -126,7 +136,7 @@ for name, data in catalogs.items():
             raise SystemExit(f"{name}:{key} must be a non-empty string")
 
 panel = Path("Panel.qml").read_text(encoding="utf-8")
-used = set(re.findall(r'strings\.t\("([a-z0-9.]+)"\)', panel))
+used = set(re.findall(r'root\.t\("([a-z0-9.]+)"\)', panel))
 used.update(re.findall(r'(?:titleKey|detailKey): "([a-z0-9.]+)"', panel))
 if used != source_keys:
     missing = sorted(source_keys - used)
