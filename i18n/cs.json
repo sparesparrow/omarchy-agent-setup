@@ -15,5 +15,7 @@
   "action.catalog.title": "Katalog promptů",
   "action.catalog.detail": "Otevře místní prompty z mcp-prompts a mcp-project-orchestrator",
   "action.mcp.title": "MCP servery a skills",
-  "action.mcp.detail": "Zkopíruje skills a volitelně zaregistruje ověřené MCP servery"
+  "action.mcp.detail": "Zkopíruje skills a volitelně zaregistruje ověřené MCP servery",
+  "action.team.title": "Agent tým",
+  "action.team.detail": "Nastaví Orchestratora, Executora a Evaluatora pro nainstalované nástroje"
 }

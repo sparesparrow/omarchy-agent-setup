@@ -15,5 +15,7 @@
   "action.catalog.title": "Prompt Catalog",
   "action.catalog.detail": "Open local prompts adapted from mcp-prompts and mcp-project-orchestrator",
   "action.mcp.title": "MCP Servers and Skills",
-  "action.mcp.detail": "Copy skills and optionally register reviewed MCP servers"
+  "action.mcp.detail": "Copy skills and optionally register reviewed MCP servers",
+  "action.team.title": "Agent Team",
+  "action.team.detail": "Set up Orchestrator, Executor, and Evaluator for installed tools"
 }

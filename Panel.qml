@@ -62,6 +62,11 @@ Item {
       titleKey: "action.mcp.title",
       detailKey: "action.mcp.detail",
       command: ["bash", pluginDir + "/setup/mcp-skills.sh"]
+    },
+    {
+      titleKey: "action.team.title",
+      detailKey: "action.team.detail",
+      command: ["bash", pluginDir + "/setup/agent-team.sh"]
     }
   ]
 
