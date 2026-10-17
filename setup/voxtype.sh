@@ -2,8 +2,11 @@
 set -euo pipefail
 source "$(dirname "$0")/lib.sh"
 require_terminal "$@"
+
 say "Voxtype — diktování na Omarchy"
 say "Po instalaci držíš F9 nebo přepínáš Super+Ctrl+X. Výchozí model je anglický."
+
+# 1. Install
 if ! command -v voxtype >/dev/null 2>&1; then
   if command -v omarchy >/dev/null 2>&1 && confirm "Nainstalovat: omarchy pkg add voxtype-bin?"; then
     omarchy pkg add voxtype-bin
@@ -13,7 +16,33 @@ if ! command -v voxtype >/dev/null 2>&1; then
     exit 1
   fi
 fi
-if command -v voxtype >/dev/null 2>&1 && confirm "Spustit výběr modelu: voxtype setup model?"; then
+
+# 2. Model
+if confirm "Spustit výběr modelu: voxtype setup model?"; then
   voxtype setup model
 fi
+
+# 3. Autostart check
+if [[ -d "$HOME/.config/autostart" ]] && ! ls "$HOME/.config/autostart" | grep -qi voxtype; then
+  if confirm "Voxtype se nespouští automaticky. Přidat do autostartu?"; then
+    mkdir -p "$HOME/.config/autostart"
+    cat > "$HOME/.config/autostart/voxtype.desktop" <<'EOF'
+[Desktop Entry]
+Type=Application
+Name=Voxtype
+Exec=voxtype
+X-GNOME-Autostart-enabled=true
+EOF
+    say "Přidáno do autostartu."
+  fi
+fi
+
+# 4. Config check
+if [[ -d "$HOME/.config/voxtype" ]]; then
+  say "Konfigurace: ~/.config/voxtype"
+else
+  say "Konfigurace se vytvoří při prvním spuštění."
+fi
+
+say "Hotovo. F9 drž pro diktování, Super+Ctrl+X přepíná."
 pause_at_end
