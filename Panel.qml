@@ -67,6 +67,11 @@ Item {
       titleKey: "action.team.title",
       detailKey: "action.team.detail",
       command: ["bash", pluginDir + "/setup/agent-team.sh"]
+    },
+    {
+      titleKey: "action.repositories.title",
+      detailKey: "action.repositories.detail",
+      command: ["bash", pluginDir + "/setup/github-repositories.sh"]
     }
   ]
 
