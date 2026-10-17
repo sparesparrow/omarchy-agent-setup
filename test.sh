@@ -65,10 +65,13 @@ expected_actions = {
     "action.openclaw.title": ["setup/openclaw-cs.sh"],
     "action.voxtype.title": ["setup/voxtype.sh"],
     "action.plugins.title": ["setup/plugins.sh"],
+    "action.ecosystem.title": ["setup/omarchy-ecosystem.sh"],
     "action.omp.title": ["setup/omp-presets.sh"],
     "action.mia.title": ["setup/mia-voice.sh"],
     "action.catalog.title": ["prompt-catalog/README.md"],
     "action.mcp.title": ["setup/mcp-skills.sh"],
+    "action.team.title": ["setup/agent-team.sh"],
+    "action.repositories.title": ["setup/github-repositories.sh"],
 }
 removed_actions = ("action.plan.title", "action.audit.title", "action.notes.title")
 

@@ -8,6 +8,8 @@
   "action.voxtype.detail": "Nainstaluje diktování a nechá tě vybrat model řeči",
   "action.plugins.title": "Další pluginy",
   "action.plugins.detail": "Ukáže katalog Omarchy pluginů a nainstaluje jen potvrzené",
+  "action.ecosystem.title": "Ekosystém Hermes a Omarchy",
+  "action.ecosystem.detail": "Krok za krokem nainstaluje Infomarchy, Hermes, Omatchy a Herald OS, vždy po potvrzení",
   "action.omp.title": "Předvolby Oh My Pi",
   "action.omp.detail": "Připraví role pro Mia, Libertin, Human Action a další projekty",
   "action.mia.title": "Hlasová konzole MIA",

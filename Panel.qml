@@ -44,6 +44,11 @@ Item {
       command: ["bash", pluginDir + "/setup/plugins.sh"]
     },
     {
+      titleKey: "action.ecosystem.title",
+      detailKey: "action.ecosystem.detail",
+      command: ["bash", pluginDir + "/setup/omarchy-ecosystem.sh"]
+    },
+    {
       titleKey: "action.omp.title",
       detailKey: "action.omp.detail",
       command: ["bash", pluginDir + "/setup/omp-presets.sh"]

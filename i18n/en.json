@@ -8,6 +8,8 @@
   "action.voxtype.detail": "Install dictation and choose its speech model yourself",
   "action.plugins.title": "More Plugins",
   "action.plugins.detail": "Browse the Omarchy plugin catalog and install only confirmed plugins",
+  "action.ecosystem.title": "Hermes and Omarchy Ecosystem",
+  "action.ecosystem.detail": "Install Infomarchy, Hermes, Omatchy and Herald OS step by step, each after confirmation",
   "action.omp.title": "Oh My Pi Presets",
   "action.omp.detail": "Prepare role presets for Mia, Libertin, Human Action, and other projects",
   "action.mia.title": "MIA Voice Console",
