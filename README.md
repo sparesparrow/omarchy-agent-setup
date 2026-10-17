@@ -1,6 +1,6 @@
 # Nastavení agentů pro Omarchy
 
-Plugin sleduje jazyk zvolený v **Nastavení > Jazyk**. Čeština je v oficiálním registru Omarchy jako `cs`, s lokalitou `cs_CZ.UTF-8`. Texty panelu jsou v `i18n/cs.json` a načítají se přes `Commons.Translations`, stejně jako u vestavěných pluginů. Chybějící řetězec spadne na `i18n/en.json`. Logy a diagnostika zůstávají anglicky.
+Jazyk panelu lze přepnout přímo v panelu pomocí **EN / Čeština**. Výchozí jazyk je angličtina. Texty se načítají z přibalených souborů `i18n/en.json` a `i18n/cs.json` přes `Quickshell.Io.FileView`; chybějící český řetězec použije anglický text. Klávesy Tab/Shift+Tab a šipky nahoru/dolů vybírají jazyk i všechny akce, Enter nebo mezerník je aktivuje a Escape panel zavře. Logy a diagnostika zůstávají anglicky.
 
 Při instalaci pluginu se nic dalšího nenainstaluje. Každý skript se před zápisem nebo instalací zeptá znovu.
 
